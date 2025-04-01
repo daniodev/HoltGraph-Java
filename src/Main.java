@@ -1,117 +1,124 @@
-import TipiDiNodo.Nodo;
-import TipiDiNodo.Processo;
-import TipiDiNodo.Risorsa;
+import it.mazambo.typesofedge.Node;
+import it.mazambo.typesofedge.Process;
+import it.mazambo.typesofedge.Resource;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 
-    public static final String verde = "\u001B[32m";
-    public static final String bianco = "\u001B[0m";
-    public static final String rosso = "\u001B[31m";
-    public static final String blu = "\u001B[34m";
-    public static final String giallo = "\u001B[33m";
+    public static final String GREEN = "\u001B[32m";
+    public static final String WHITE = "\u001B[0m";
+    public static final String RED = "\u001B[31m";
+    public static final String BLUE = "\u001B[34m";
+    public static final String YELLOW = "\u001B[33m";
 
-    public static void main(String[] args){
-        Grafo grafo = new Grafo();
+    public static void main(String[] args) {
+        Graph graph = new Graph();
 
-        while (true){
+        while (true) {
 
-            System.out.println("Cosa desideri fare: ");
-            System.out.println("1: Aggiungi un nodo.");
-            System.out.println("2: Aggiungi un arco.");
-            System.out.println("3: Stampa grafo fino ad ora.");
-            System.out.println("4: Riduci il grafo.");
-            System.out.println("5: Esci.");
+            System.out.println("What would you like to do: ");
+            System.out.println("1: Add a Node.");
+            System.out.println("2: Add an edge.");
+            System.out.println("3: Print the graph.");
+            System.out.println("4: Reduce the graph.");
+            System.out.println("5: Exit.");
 
             Scanner scanner = new Scanner(System.in);
             int option = scanner.nextInt();
 
-            if(option == 1){
-                System.out.println("Che tipo di nodo si vuole aggiungere: ");
-                System.out.println("1: Processo.");
-                System.out.println("2: Risorsa.");
+            if (option == 1) {
+                System.out.println("Which type of node would you like to add: ");
+                System.out.println("1: Process.");
+                System.out.println("2: Resource.");
 
                 int optionn = scanner.nextInt();
 
-                if(optionn == 1){
-                    System.out.println("Inserire l'id del processo: ");
-                    grafo.aggiungiNodo(new Processo((short) scanner.nextInt()));
+                if (optionn == 1) {
+                    System.out.println("Insert the ID of the process: ");
+                    graph.addNode(new Process((short) scanner.nextInt()));
                 }
 
-                if (optionn == 2){
-                    System.out.println("Inserire l'id della risorsa: ");
-                    grafo.aggiungiNodo(new Risorsa((short) scanner.nextInt()));
+                if (optionn == 2) {
+                    System.out.println("Insert the ID of the resource: ");
+                    graph.addNode(new Resource((short) scanner.nextInt()));
                 }
             }
 
-            if(option == 2){
+            if (option == 2) {
 
-                System.out.println("Inserire il processo: ");
-                System.out.println("Processi disponibili: ");
+                System.out.println("Insert the process: ");
+                System.out.println("Available processes: ");
 
-                for(Nodo nodo: grafo.getNodi()){
-                    if(nodo instanceof Processo) {
-                        System.out.print(nodo.getId() + ", ");
+                if (!graph.getNodi().isEmpty() || !graph.getEdges().isEmpty()) {
+                    for (Node node : graph.getNodi()) {
+                        if (node instanceof Process) {
+                            System.out.print(node.getId() + ", ");
+                        }
                     }
-                }
-                System.out.println();
-                Processo processo = (Processo) grafo.getNodo((short) scanner.nextInt());
+                    System.out.println();
+                    Process process = (Process) graph.getNodo((short) scanner.nextInt());
 
-                System.out.println("Inserire la risorsa: ");
-                System.out.println("Risorse disponibili: ");
-                for(Nodo nodo: grafo.getNodi()){
-                    if(nodo instanceof Risorsa) {
-                        System.out.print(nodo.getId() + ", ");
+                    System.out.println("Insert the resource: ");
+                    System.out.println("Available resources: ");
+
+                    for (Node node : graph.getNodi()) {
+                        if (node instanceof Resource) {
+                            System.out.print(node.getId() + ", ");
+                        }
                     }
-                }
-                System.out.println();
-                Risorsa risorsa = (Risorsa) grafo.getNodo((short) scanner.nextInt());
 
-                if(!risorsa.isBusy()){
-                    grafo.aggiungiArco(new Arco(risorsa, processo));
-                    risorsa.setBusy();
-                    System.out.println(verde + "Risorsa " + risorsa.getId() + " libera, arco uscente." + bianco);
-                }else{
-                    grafo.aggiungiArco(new Arco(processo, risorsa));
-                    risorsa.aggiungiProcessoInAttesa(processo);
-                    System.out.println(rosso + "Risorsa " + risorsa.getId() + " occupata, arco entrante." + bianco);
-                    System.out.println(rosso + "Processo " + processo.getId() + " aggiunto in attesa di: " + risorsa.getId() + bianco);
+                    System.out.println();
+                    Resource resource = (Resource) graph.getNodo((short) scanner.nextInt());
+
+                    if (!resource.isBusy()) {
+                        graph.addEdge(new Edge(resource, process));
+                        resource.setBusy();
+                        System.out.println(GREEN + "Resource " + resource.getId() + " free, outgoing edge." + WHITE);
+                    } else {
+
+                        graph.addEdge(new Edge(process, resource));
+                        resource.addPendingProcess(process);
+                        System.out.println(GREEN + "Resource " + resource.getId() + " occupied, incoming edge." + WHITE);
+                        System.out.println(GREEN + "Process " + process.getId() + " added inside: " + resource.getId() + " wait list." + WHITE);
+
+                    }
+                } else {
+                    System.out.println(RED + "Error: Number of processes and resources insufficient." + WHITE);
                 }
 
             }
 
-            if(option == 3){
+            if (option == 3) {
 
-                System.out.println(verde + "Grafo fino ad ora: " + bianco);
+                System.out.println(GREEN + "Current graph: " + WHITE);
 
                 String startingArrow = "-->";
-                String destinazionArrow = "<--";
+                String destinationArrow = "<--";
 
-                for (Nodo n: grafo.getNodi()) {
-                    if(n instanceof Processo) {
-                        System.out.print(blu + n.getId() + bianco);
+                for (Node n : graph.getNodi()) {
+                    if (n instanceof Process) {
+                        System.out.print(BLUE + n.getId() + WHITE);
                     }
-                    if(n instanceof Risorsa){
-                        System.out.print(giallo + n.getId() + bianco);
+                    if (n instanceof Resource) {
+                        System.out.print(YELLOW + n.getId() + WHITE);
                     }
 
-                    for(Arco arco: grafo.getArchi()){
-                        if(arco.getNodoDidestinazione().getId() == n.getId()){
-                            System.out.print(destinazionArrow);
-                            if(arco.getNodoDipartenza() instanceof Processo){
-                                System.out.print(blu + arco.getNodoDipartenza().getId() + " " + bianco);
-                            }else{
-                                System.out.print(giallo + arco.getNodoDipartenza().getId() + " " + bianco);
+                    for (Edge edge : graph.getEdges()) {
+                        if (edge.getDestinationEdge().getId() == n.getId()) {
+                            System.out.print(destinationArrow);
+                            if (edge.getSourceEdge() instanceof Process) {
+                                System.out.print(BLUE + edge.getSourceEdge().getId() + " " + WHITE);
+                            } else {
+                                System.out.print(YELLOW + edge.getSourceEdge().getId() + " " + WHITE);
                             }
                         }
-                        if(arco.getNodoDipartenza().getId() == n.getId()){
+                        if (edge.getSourceEdge().getId() == n.getId()) {
                             System.out.print(startingArrow);
-                            if(arco.getNodoDidestinazione() instanceof Processo){
-                                System.out.print(blu + arco.getNodoDidestinazione().getId() + " " + bianco);
-                            }else {
-                                System.out.print(giallo + arco.getNodoDidestinazione().getId() + " " + bianco);
+                            if (edge.getDestinationEdge() instanceof Process) {
+                                System.out.print(BLUE + edge.getDestinationEdge().getId() + " " + WHITE);
+                            } else {
+                                System.out.print(YELLOW + edge.getDestinationEdge().getId() + " " + WHITE);
                             }
                         }
                     }
@@ -121,42 +128,46 @@ public class Main {
             }
 
             if (option == 4) {
-                for (Nodo risorsa : grafo.getNodi()) {
-                    if (risorsa instanceof Risorsa) {
+                for (Node resource : graph.getNodi()) {
+                    if (resource instanceof Resource) {
 
-                        if (((Risorsa) risorsa).isBusy()) {
-                            System.out.println(giallo + "Risorsa: " + risorsa.getId() + " occupata, controllo riducibilità." + bianco);
+                        if (((Resource) resource).isBusy()) {
+                            System.out.println(YELLOW + "Resource: " + resource.getId() + " occupied, checking reducibility." + WHITE);
 
-                            Processo risorsaBusyWithProcess = null;
-                            boolean notInAttesaP = true;
+                            Process resourceBusyWithProcess = null;
+                            boolean notWaitingProcess = true;
 
-                            // Usa un ciclo for tradizionale
-                            for (int i = 0; i < grafo.getArchi().size(); i++) {
-                                Arco arco = grafo.getArchi().get(i);
-                                if (arco.getNodoDipartenza().equals(risorsa)) {
-                                    risorsaBusyWithProcess = (Processo) arco.getNodoDidestinazione();
-                                    System.out.println(giallo + "Processo occupante: " + risorsaBusyWithProcess.getId() + bianco);
+                            // Identify the occupying process
+                            for (int i = 0; i < graph.getEdges().size(); i++) {
+                                Edge edge = graph.getEdges().get(i);
+                                //Checks for every edge to find the one with the one with the same source of the buys process.
+                                if (edge.getSourceEdge().equals(resource)) {
+                                    resourceBusyWithProcess = (Process) edge.getDestinationEdge();
+                                    System.out.println(YELLOW + "Occupying process: " + resourceBusyWithProcess.getId() + WHITE);
 
-                                    for (Arco a : grafo.getArchi()) {
-                                        if (a.getNodoDipartenza().equals(risorsaBusyWithProcess)) {
-                                            System.out.println(rosso + "Arco non riducibile, trovato processo in attesa." + bianco);
-                                            notInAttesaP = false;
+                                    for (Edge a : graph.getEdges()) {
+                                        //Checks if the found process is waiting for a resource.
+                                        if (a.getSourceEdge().equals(resourceBusyWithProcess)) {
+                                            System.out.println(RED + "Edge not reducible, waiting process found." + WHITE);
+                                            notWaitingProcess = false;
                                             break;
                                         }
                                     }
                                 }
 
-                                if (notInAttesaP) {
-                                    System.out.println(blu + "Arco partente da: " + risorsaBusyWithProcess.getId() + " rimosso!" + bianco);
-                                    grafo.getArchi().remove(i);
+                                //If the process has no waiting processes them the graph can be reduced!
+                                if (notWaitingProcess && resourceBusyWithProcess != null) {
+                                    System.out.println(BLUE + "Outgoing edge from: " + resourceBusyWithProcess.getId() + " removed!" + WHITE);
+                                    graph.getEdges().remove(i);
 
-                                    if (!((Risorsa) risorsa).getProcessiInAttesa().isEmpty()) {
-                                        System.out.println(blu + "Arco partente da: " + ((Risorsa) risorsa).getProcessiInAttesa().get(0).getId() + " invertito!" + bianco);
-                                        for (Arco a : grafo.getArchi()) {
-                                            if (a.getNodoDipartenza().equals(((Risorsa) risorsa).getProcessiInAttesa().get(0))) {
-                                                grafo.getArchi().remove(a);
-                                                grafo.getArchi().add(new Arco(risorsa, ((Risorsa) risorsa).getProcessiInAttesa().get(0)));
-                                                ((Risorsa) risorsa).getProcessiInAttesa().remove(0);
+                                    //Checks if the graph has waiting processes and inverts the edge (arrow).
+                                    if (!((Resource) resource).getPendingProcesses().isEmpty()) {
+                                        System.out.println(BLUE + "Outgoing edge from: " + ((Resource) resource).getPendingProcesses().get(0).getId() + " inverted!" + WHITE);
+                                        for (Edge a : graph.getEdges()) {
+                                            if (a.getSourceEdge().equals(((Resource) resource).getPendingProcesses().get(0))) {
+                                                graph.getEdges().remove(a);
+                                                graph.getEdges().add(new Edge(resource, ((Resource) resource).getPendingProcesses().get(0)));
+                                                ((Resource) resource).getPendingProcesses().remove(0);
                                                 break;
                                             }
                                         }
@@ -168,14 +179,11 @@ public class Main {
                 }
             }
 
-            if(option == 5){
-                System.out.println("Uscito correttamente dal programma.");
+            if (option == 5) {
+                System.out.println("Successfully exited the program.");
                 break;
             }
 
         }
-
-
     }
-
 }
