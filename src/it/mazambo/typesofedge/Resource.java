@@ -24,6 +24,7 @@ public class Resource extends Node {
     public Resource(short id){
         super(id);
         pendingProcesses = new ArrayList<>();
+        isAProcess = false;
     }
 
     public void addPendingProcess(Process p){

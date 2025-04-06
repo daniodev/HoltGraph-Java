@@ -50,26 +50,26 @@ public class Main {
                 System.out.println("Insert the process: ");
                 System.out.println("Available processes: ");
 
-                if (!graph.getNodi().isEmpty() || !graph.getEdges().isEmpty()) {
-                    for (Node node : graph.getNodi()) {
+                if (!graph.getNodes().isEmpty() || !graph.getEdges().isEmpty()) {
+                    for (Node node : graph.getNodes()) {
                         if (node instanceof Process) {
                             System.out.print(node.getId() + ", ");
                         }
                     }
                     System.out.println();
-                    Process process = (Process) graph.getNodo((short) scanner.nextInt());
+                    Process process = (Process) graph.getNode((short) scanner.nextInt());
 
                     System.out.println("Insert the resource: ");
                     System.out.println("Available resources: ");
 
-                    for (Node node : graph.getNodi()) {
+                    for (Node node : graph.getNodes()) {
                         if (node instanceof Resource) {
                             System.out.print(node.getId() + ", ");
                         }
                     }
 
                     System.out.println();
-                    Resource resource = (Resource) graph.getNodo((short) scanner.nextInt());
+                    Resource resource = (Resource) graph.getNode((short) scanner.nextInt());
 
                     if (!resource.isBusy()) {
                         graph.addEdge(new Edge(resource, process));
@@ -96,7 +96,7 @@ public class Main {
                 String startingArrow = "-->";
                 String destinationArrow = "<--";
 
-                for (Node n : graph.getNodi()) {
+                for (Node n : graph.getNodes()) {
                     if (n instanceof Process) {
                         System.out.print(BLUE + n.getId() + WHITE);
                     }
@@ -125,10 +125,15 @@ public class Main {
                     System.out.println();
                 }
 
+                GraphGraphics graphGraphics = new GraphGraphics(graph.getNodes(), graph.getEdges());
+                graphGraphics.setVisible(true);
+                graphGraphics.setSize(800, 600);
+                graphGraphics.setLocationRelativeTo(null);
+
             }
 
             if (option == 4) {
-                for (Node resource : graph.getNodi()) {
+                for (Node resource : graph.getNodes()) {
                     if (resource instanceof Resource) {
 
                         if (((Resource) resource).isBusy()) {

@@ -32,7 +32,7 @@ public class Graph {
 
     }
 
-    public List<Node> getNodi() {
+    public List<Node> getNodes() {
         return nodes;
     }
 
@@ -40,7 +40,7 @@ public class Graph {
         return edges;
     }
 
-    public Node getNodo(short id){
+    public Node getNode(short id){
         for(Node nodo: nodes){
             if(nodo.getId() == id){
                 return nodo;
